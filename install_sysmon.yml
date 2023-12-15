@@ -29,7 +29,7 @@
           dest: "{{path}}"
 
       - name: Install sysmon package
-        win_shell: sysmon -accepteula -i
+        win_shell: sysmon.exe -accepteula -i
         args:
           chdir: "{{path}}"
       
