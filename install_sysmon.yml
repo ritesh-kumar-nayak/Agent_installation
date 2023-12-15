@@ -29,9 +29,9 @@
           dest: "{{path}}"
 
       - name: Install sysmon package
-        win_shell: sysmon.exe -accepteula -i
-        args:
-          chdir: "{{path}}"
+        win_shell: Start-Process -FilePath "C:\agents\sysmon\sysmon.exe" -ArgumentList "-accepteula -i" -Wait
+#        args:
+#          chdir: "{{path}}"
       
       - name: Check sysmon service installation status
         win_shell: Get-service -Name sysmon
