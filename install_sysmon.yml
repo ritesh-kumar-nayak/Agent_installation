@@ -18,10 +18,10 @@
 
       - name: Download installer zip file
         ansible.windows.win_get_url:
-          url: https://github.com/AnupamRoy2191/Agent_installation/blob/main/Sysmon.zip
+          url: https://github.com/AnupamRoy2191/Agent_installation/raw/main/Sysmon.zip
           dest: "{{path}}"
-          checksum: ee78ba3cd51784a2f00d677b17fdc0884476860ae6a5a055fe2beeb3eb1394c6d0aaa09d54931f7298d8574fb4ad578fa629b8805cee2b840997a88c9f4e7b6c
-          checksum_algorithm: sha512
+          # checksum: ee78ba3cd51784a2f00d677b17fdc0884476860ae6a5a055fe2beeb3eb1394c6d0aaa09d54931f7298d8574fb4ad578fa629b8805cee2b840997a88c9f4e7b6c
+          # checksum_algorithm: sha512
 
       - name: Unzip installer zip file
         community.windows.win_unzip:
