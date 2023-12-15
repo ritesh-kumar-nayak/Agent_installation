@@ -1,0 +1,39 @@
+---
+- name: Install Sysmon
+  hosts: windows
+  vars_prompt:
+      - name: machine
+        prompt: "Please mention on which OS machines you want to add user: \n 1. windows \n 2. linux "
+        private: no
+  become_method: pwsh
+  tasks:
+      - name: Create directory to download sysmon package
+        win_file:
+          path: C:\Users\RandomUser\earthrise.jpg
+          state: directory
+
+      - name: Add user ownership to this directory
+        win_owner:
+          path: C:\Users\RandomUser\earthrise.jpg
+          user: ansible
+        recurse: true
+
+      - name: Download installer zip file
+        ansible.windows.win_get_url:
+          url: 
+          dest: C:\Users\RandomUser\earthrise.jpg
+
+      - name: Unzip installer zip file
+        community.windows.win_unzip:
+          src: C:\Logs\application-error-logs.gz
+          dest: C:\ExtractedLogs\application-error-logs
+
+      - name: Install sysmon package
+        win_shell: sysmon -accepteula -i
+        args:
+          chdir: C:\somedir
+      
+      - name: Check sysmon service installation status
+        win_shell: Get-service -Name sysmon
+
+
