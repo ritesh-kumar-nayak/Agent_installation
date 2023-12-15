@@ -39,6 +39,6 @@
 
       - name: print sysmon status
         debug:
-          msg: "{{status}}"
+          msg: "{{status.stdout_lines}}"
 
 
