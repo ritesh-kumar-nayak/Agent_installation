@@ -23,7 +23,7 @@
 
       - name: Unzip installer zip file
         community.windows.win_unzip:
-          src: "{{path}}\Sysmon.zip"
+          src: "{{path}}\\Sysmon.zip"
           dest: "{{path}}"
 
       - name: Install sysmon package
