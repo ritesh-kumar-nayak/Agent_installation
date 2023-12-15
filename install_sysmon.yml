@@ -20,7 +20,9 @@
         ansible.windows.win_get_url:
           url: https://github.com/AnupamRoy2191/Agent_installation/blob/main/Sysmon.zip
           dest: "{{path}}"
-
+          checksum: 7d750dfbfee769aa27947477cb4d0db73f14a0a865b7d81072d29209ce8d0716a9778296d253b3ba0085766a2ebc3932704feeb2c37ed4584d591266c84692d3
+          checksum_algorithm: sha512
+          
       - name: Unzip installer zip file
         community.windows.win_unzip:
           src: "{{path}}\\Sysmon.zip"
