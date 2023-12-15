@@ -29,7 +29,7 @@
           dest: "{{path}}"
 
       - name: Install sysmon package
-        win_shell: Start-Process -FilePath "C:\agents\sysmon\sysmon.exe" -ArgumentList "-accepteula -i" -Wait
+        win_shell: Start-Process -FilePath "{{path}}\\sysmon.exe" -ArgumentList "-accepteula -i" -Wait
 #        args:
 #          chdir: "{{path}}"
       
