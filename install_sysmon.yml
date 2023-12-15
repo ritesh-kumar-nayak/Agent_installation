@@ -35,5 +35,10 @@
       
       - name: Check sysmon service installation status
         win_shell: Get-service -Name sysmon
+        register: status
+
+      - name: print sysmon status
+        debug:
+          msg: "{{status.stdout}}"
 
 
