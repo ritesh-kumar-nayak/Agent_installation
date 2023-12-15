@@ -14,7 +14,7 @@
         win_owner:
           path: "{{path}}"
           user: ansible
-        recurse: true
+          recurse: true
 
       - name: Download installer zip file
         ansible.windows.win_get_url:
