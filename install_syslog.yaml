@@ -1,0 +1,44 @@
+---
+
+- name: install syslog
+  hosts: linux
+  become: yes
+  vars:
+    config_path: /etc/rsyslog.conf
+  tasks:
+    - name: Adding adiscon/ppa:adiscon/v8-stable repository
+      apt_repository:
+        repo: 'ppa:adiscon/v8-stable'  #add the stable version 8
+        state: present
+
+    - name: Run apt-get update if the repository was added
+      apt:
+        update_cache: yes
+      
+
+    - name: Install Rsyslog
+      apt:
+        name: rsyslog
+        state: present
+
+    - name: Checking the version
+      command: rsyslogd -v
+      register: rsyslog_version_output
+    
+    - name: Display the version
+      debug:
+        var: rsyslog_version_output.stdout_lines
+    
+    - name: Add lines to the buttom
+      blockinfile:
+        path: "{{config_path}}"
+        block: |
+          *.*       @@someName.group.net:someDigit
+          *.*       @@someName.group.net:someDigit
+      notify: Restart Rsyslog
+
+  handlers:
+    - name: Restart Rsyslog
+      service: 
+        name: rsyslog
+        state: restarted
