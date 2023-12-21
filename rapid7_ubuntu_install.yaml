@@ -1,0 +1,48 @@
+---
+
+- name: Install Rapid7 Scan Assistant
+  hosts: linux
+  become: true
+  vars:
+    temp_path: /tmp
+    deb_package: R7ScanAssistant_amd64.deb
+    unzipped: /tmp/rapid7
+    zipped: /tmp/rapid7.tar
+
+
+  tasks:
+
+    - name: Download the package
+      get_url:
+        url: https://github.com/ritesh-kumar-nayak/Agent_installation/raw/main/rapid7.tar
+        dest: "{{temp_path}}"
+    
+    - name: Unzip Rapid7
+      unarchive:
+        src:  "{{temp_path}}/rapid7.tar"
+        dest: "{{temp_path}}"
+        remote_src: yes
+    
+    - name: Install Rapid7 Debian package
+      shell: "dpkg -i {{ deb_package }}"
+      args:
+        chdir: "{{ temp_path }}/rapid7"
+    
+    - name: Check Rapid7 service status
+      ansible.builtin.service:
+        name: R7ScanAssistant.service
+        state: started
+      register: service_status
+    
+    - name: Display status
+      debug:
+        var: "{{service_status.state}}"
+
+    - name: Delete Rapid7 files post installation
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{unzipped}}"
+        - "{{zipped}}"
+      when: "'started' == service_status.state"
