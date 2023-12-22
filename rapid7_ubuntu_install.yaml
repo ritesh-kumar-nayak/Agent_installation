@@ -8,6 +8,8 @@
     deb_package: R7ScanAssistant_amd64.deb
     unzipped: /tmp/rapid7
     zipped: /tmp/rapid7.tar
+    config_src: /tmp/rapid7/config.json
+    config_dest: /etc/rapid7/ScanAssistant/config.json
 
 
   tasks:
@@ -37,6 +39,12 @@
     - name: Display status
       debug:
         var: "{{service_status.state}}"
+
+    - name: Copying the config.json
+      copy:
+        src: "{{config_src}}"
+        dest: "{{config_dest}}"
+        remote_src: yes
 
     - name: Delete Rapid7 files post installation
       ansible.builtin.file:
