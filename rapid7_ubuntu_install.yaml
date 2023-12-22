@@ -45,6 +45,11 @@
         src: "{{config_src}}"
         dest: "{{config_dest}}"
         remote_src: yes
+        
+    - name: Restarting Rapid7
+      ansible.builtin.service:
+        name: R7ScanAssistant.service
+        state: restarted
 
     - name: Delete Rapid7 files post installation
       ansible.builtin.file:
