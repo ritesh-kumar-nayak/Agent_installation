@@ -1,0 +1,48 @@
+---
+- name: Install LV Elastic agent on Windows Machines
+  hosts: windows
+ 
+  vars:
+    folder_path: "C:\\Users\\ansible\\Downloads\\elk"
+    Zip_file_url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.6.0-windows-x86_64.zip"
+    Zip_file_path: "C:\\Users\\ansible\\Downloads\\elk\\elastic-agent-8.6.0-windows-x86_64.zip"
+    Extracted_path: "C:\\Users\\ansible\\Downloads\\elk\\elastic-agent-8.6.0-windows-x86_64"
+    command_to_execute: ".\\elastic-agent.exe install --force"
+    check_stat: 'Get-Service -name "Elastic Agent"'
+ 
+  tasks:
+    - name: Create ELK folder under Downloads
+      win_file:
+        path: "{{ folder_path }}"
+        state: directory
+ 
+    - name: Download ELK Zip file
+      win_get_url:
+        url: "{{ Zip_file_url }}"
+        dest: "{{ folder_path }}"
+ 
+    - name: Extract Zip File
+      win_unzip:
+        src: "{{ Zip_file_path }}"
+        dest: "{{ folder_path }}"
+ 
+    - name: Execute Command to Install
+      win_command: "{{ command_to_execute }}"
+      args:
+        chdir: "{{ Extracted_path }}"
+ 
+    - name: Check status of agent
+      win_shell: "{{ check_stat }}"
+      register: command_output
+ 
+    - name: Display Command Output
+      debug:
+        var: command_output.stdout_lines
+ 
+    - name: clean up Zip file and extracted folders
+      win_file:
+        path: "{{ folder_path }}\\{{ item }}"
+        state: absent
+      with_items:
+        - elastic-agent-8.6.0-windows-x86_64.zip
+        - elastic-agent-8.6.0-windows-x86_64
