@@ -1,0 +1,47 @@
+---
+- name: Install ELK Agent
+  hosts: ubuntu
+  become: true
+  vars:
+    path: /opt/elk
+  tasks:
+    - name: Create /opt/elk/ directory
+      file:
+        path: "{{path}}"
+        state: directory
+        owner: vmadmin
+        group: vmadmin
+        mode: '0750'
+    - name: Download Elastic Agent
+      get_url:
+        url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.6.0-linux-x86_64.tar.gz"
+        dest: "{{path}}/elastic-agent-8.6.0-linux-x86_64.tar.gz"
+ 
+    - name: Extract Elastic Agent
+      ansible.builtin.unarchive:
+        src: "{{path}}/elastic-agent-8.6.0-linux-x86_64.tar.gz"
+        dest: "{{path}}"
+        remote_src: yes
+ 
+    - name: Install ELK package
+      shell: "{{path}}/elastic-agent-8.6.0-linux-x86_64/elastic-agent install -f"
+      args:
+        chdir: "{{path}}"
+ 
+    - name: Check ELK service status
+      systemd:
+        name: elastic-agent
+        state: started
+        enabled: yes
+      register: service_status
+    - name: Display ELK service status
+      debug:
+        msg: "{{service_status.state}}"
+ 
+    - name: clean up tar file and extracted folders
+      file:
+        path: "{{path}}/{{ item }}"
+        state: absent
+      with_items:
+        - elastic-agent-8.6.0-linux-x86_64.tar.gz
+        - elastic-agent-8.6.0-linux-x86_64

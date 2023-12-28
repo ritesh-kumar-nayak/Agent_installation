@@ -1,0 +1,53 @@
+---
+- name: Install Rapid7 in Windows
+  hosts: windows
+  become_method: pwsh
+  vars:
+    download_dest: C:\rapid_temp
+    rapid7_msi_url: https://download2.rapid7.com/download/InsightVM/ScanAssistantInstaller.msi
+    check_sum_url: https://download2.rapid7.com/download/InsightVM/ScanAssistantInstaller.msi.sha512sum
+    secret_key: ---insertYo1234ur.pem----
+  tasks:
+
+    - name: Create a temp folder
+      win_file:
+        path: "{{download_dest}}"
+        state: directory
+
+    - name: Download Rapid7 msi
+      win_get_url:
+        url:  "{{rapid7_msi_url}}"
+        dest: "{{download_dest}}"
+    
+    - name: Download checksum file
+      win_get_url:
+        url: "{{check_sum_url}}"
+        dest: "{{download_dest}}"
+    
+    - name: install Rapid7
+      win_shell: |
+        cd {{download_dest}}
+        msiexec /i ScanAssistantInstaller.msi CLIENT_CERTIFICATE="PEM"
+        
+
+    - name: get service info thru shell
+      win_shell: Get-Service r7ScanAssistant
+      register: status
+    - name: Display Status of service  
+      debug:
+        msg: "{{status.stdout_lines}}"
+    
+
+    - name: Delete temp folder if service is running
+      win_file:
+        path: "{{download_dest}}"
+        state: absent
+      when: "'Running' in status.stdout_lines[3]"
+
+    - name: Install Certificate
+      win_shell: |
+         Set-ItemProperty -Path 'HKLM:\SOFTWARE\Rapid7\InsightVM\ScanAssistant' -Name 'ClientCertificate' -Value '{{secret_key}}'
+
+    - name: Set the debug value
+      win_shell: |
+        Set-ItemProperty -Path 'HKLM:\SOFTWARE\Rapid7\InsightVM\ScanAssistant' -Name 'Debug' -Value 1

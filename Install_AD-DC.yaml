@@ -1,0 +1,26 @@
+---
+- name: Add Windows VM as Additional Domain Controller
+  hosts: windows
+  tasks:
+    - name: Install AD-Domain-Services role
+      win_feature:
+        name: AD-Domain-Services
+        state: present
+      become: yes
+ 
+    - name: Promote server with custom paths
+      ansible.windows.win_domain_controller:
+           dns_domain_name: practice.com
+           domain_admin_user: ansible@practice.com
+           domain_admin_password: Azure#12345678
+           safe_mode_password: Azure#12345678
+           state: domain_controller
+           sysvol_path: C:\Windows\SYSVOL
+           database_path: C:\Windows\NTDS
+           domain_log_path: C:\Windows\NTDS
+           install_dns: true
+           register: dc_promotion
+ 
+    - name: Reboot after promotion
+      ansible.windows.win_reboot:
+      when: dc_promotion.reboot_required
