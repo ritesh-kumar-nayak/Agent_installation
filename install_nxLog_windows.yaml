@@ -1,0 +1,43 @@
+---
+
+- name: Install NXLog for Windows
+  hosts: windowsvm1
+  become_method: pwsh
+    
+  vars:
+    nxlog_url: curl -LJO https://raw.githubusercontent.com/ABCR12/Agent_installation_packages/main/nxlog-ce-3.1.2319.msi -u ABCR:ghp_HAPsL73tgRXLshEvZzOv2QOUy2
+    download_dest: C:\nxLog_temp
+  tasks:
+    - name: Create nxLog temp directory
+      win_file:
+        path: "{{download_dest}}"
+        state: directory
+
+    - name: download nx log 
+      win_command: "{{nxlog_url}}"
+      args:
+        chdir: "{{download_dest}}"
+    
+    - name: install nxLog
+      win_shell: |
+        cd {{download_dest}}
+        msiexec /i nxlog-ce-3.1.2319.msi
+    
+    - name: start the service
+      win_service:
+        name: nxlog
+        state: started
+    
+    - name: Get nxLog service status
+      win_shell:  Get-Service nxlog
+      register: nxLog_status
+    
+    - name: Display Nxlog status
+      debug:
+        msg: "{{nxLog_status.stdout_lines}}"
+        
+    - name: Delete temp folder once service is running
+      win_file:
+        path: "{{download_dest}}"
+        state: absent
+      when: "'Running' in nxLog_status.stdout_lines[3]"

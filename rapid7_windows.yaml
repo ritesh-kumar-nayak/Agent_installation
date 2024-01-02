@@ -28,11 +28,16 @@
       win_shell: |
         cd {{download_dest}}
         msiexec /i ScanAssistantInstaller.msi CLIENT_CERTIFICATE="PEM"
-        
+    
+    - name: start the service
+      win_service:
+        name: r7ScanAssistant
+        state: started
 
     - name: get service info thru shell
       win_shell: Get-Service r7ScanAssistant
       register: status
+
     - name: Display Status of service  
       debug:
         msg: "{{status.stdout_lines}}"
